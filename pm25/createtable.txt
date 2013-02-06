@@ -1,0 +1,11 @@
+drop table if exists area_city_info;
+
+create table area_city_info (
+	time char(10),
+	area varchar(32),
+	city varchar(32),
+	aqi int,
+	pm2d5_1hour int,
+	pm2d5_12hour int,
+	primary key(time, area, city)
+) DEFAULT CHARSET=utf8;
