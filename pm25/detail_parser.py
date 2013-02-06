@@ -2,8 +2,6 @@
 #encoding=utf-8
 
 import sys
-import StringIO
-from lxml import etree
 from bs4 import BeautifulSoup
 import re
 
@@ -48,7 +46,6 @@ def parse_pm25detail(data):
 					flag += 1
 			citypm25info['areainfo'].append(areainfo)
 	return citypm25info
-
 
 	#print js
 

@@ -2,11 +2,14 @@
 #encoding=utf8
 
 import urllib2
-from urllib2 import HTTPError, URLError
 import sys
 import ConfigParser
-from html_parser import PM25MainHtmlParser
+import MySQLdb as mdb
+import time
+from urllib2 import HTTPError, URLError
+
 import detail_parser
+from html_parser import PM25MainHtmlParser
 
 #global
 g_cp = ConfigParser.ConfigParser()
@@ -53,9 +56,27 @@ def parse_detail_pm25(cu):
 	print url
 	data = http_get(url)
 	cityinfo = detail_parser.parse_pm25detail(data.decode('utf8', 'replace'))
-	print cityinfo
+	cityinfo['name'] = city
+	return cityinfo
 
-
+def insert_into_mysql(cu):
+	db = None
+	try:
+		db = mdb.Connect("", "", "", "")
+		cursor = db.cursor()
+		for ai in cu['areainfo']:
+			city = cu['name']
+			area = ai['name']
+			aqi = ai['aqi']
+			FORMAT = "%Y%m%d%H"
+			ymdh = time.strftime(FORMAT, time.localtime(time.time()))
+			print ymdh
+			sqlstr = "insert into area_city_info (time, area, city, aqi, pm2d5_1hour, pm2d5_12hour) values('%s', '%s', '%s', %d, %d, %d);"%\
+					(ymdh, area, city, int(aqi), int(ai['onehour']), int(ai['twelvehour']))
+			cursor.execute(sqlstr)
+	finally:
+		if db:
+			db.close()
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
@@ -66,4 +87,5 @@ if __name__ == "__main__":
 	parse_main_pm25()
 	cityurllist = parse_main_pm25()
 	for cu in cityurllist:
-		parse_detail_pm25(cu)
+		cityinfo = parse_detail_pm25(cu)
+		insert_into_mysql(cityinfo)
