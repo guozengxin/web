@@ -60,9 +60,14 @@ def parse_detail_pm25(cu):
 	return cityinfo
 
 def insert_into_mysql(cu):
+	global g_cp
+	sqlhost = g_cp.get('address','sqlhost')
+	sqldb = g_cp.get('address','sqldb')
+	sqluser = g_cp.get('address','sqluser')
+	sqlpassword = g_cp.get('address','sqlpassword')
 	db = None
 	try:
-		db = mdb.Connect("", "", "", "")
+		db = mdb.Connect(sqlhost, sqluser, sqlpassword, sqldb)
 		cursor = db.cursor()
 		for ai in cu['areainfo']:
 			city = cu['name']
